@@ -65,19 +65,27 @@ function getNewest(subreddit='ProgrammerHumor')
                 ohNoNSFW();
                 return;
             }
-            if(post.post_hint != 'image') continue;
+
+            if(post.post_hint != 'image' && post.post_hint != 'rich:video') {
+                continue;
+            }
 
             let title = post.title;
             let url_overridden_by_dest = post.url_overridden_by_dest;
             console.log(title, url_overridden_by_dest);
 
             const content = {};
-            content.embed = {
-                "title": title,
-                "image": {
-                    "url": url_overridden_by_dest
-                }
-            };
+
+            if(post.post_hint == 'image') {
+                content.embed = {
+                    "title": title,
+                    "image": {
+                        "url": url_overridden_by_dest
+                    }
+                };
+            } else if(post.post_hint == 'rich:video') {
+                content.content = url_overridden_by_dest;
+            }
 
             bot.createMessage(DISCORD_CHANNEL, content);
             break;
@@ -103,7 +111,7 @@ function getRandom(subreddit='ProgrammerHumor')
         }
         // post.post_hint: 'image'
         // post.url_overridden_by_dest > image url
-        if(post.post_hint != 'image') {
+        if(post.post_hint != 'image' && post.post_hint != 'rich:video') {
             console.log('looking for anotha');
             getRandom(subreddit);
         } else {
@@ -112,12 +120,16 @@ function getRandom(subreddit='ProgrammerHumor')
             console.log(title, url_overridden_by_dest);
 
             const content = {};
-            content.embed = {
-                "title": title,
-                "image": {
-                    "url": url_overridden_by_dest
-                }
-            };
+            if(post.post_hint == 'image') {
+                content.embed = {
+                    "title": title,
+                    "image": {
+                        "url": url_overridden_by_dest
+                    }
+                };
+            } else if(post.post_hint == 'rich:video') {
+                content.content = url_overridden_by_dest;
+            }
 
             bot.createMessage(DISCORD_CHANNEL, content);
         }
